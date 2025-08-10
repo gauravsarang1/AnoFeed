@@ -13,7 +13,7 @@ export default async function sendVerificationEmail(
             from: 'Acme <onboarding@resend.dev>',
             to: email,
             subject: 'Verification Code',
-            react: VerificationEmail({ username, otp }),
+            react: <VerificationEmail username={username} otp={otp} />,
         })
         return {
             success: true,
