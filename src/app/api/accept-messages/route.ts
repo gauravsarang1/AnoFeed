@@ -1,60 +1,43 @@
-import dbConnect from "@/src/lib/dbConect";
 import UserModel from "@/src/models/User.models";
-import { is } from 'zod/locales';
+import dbConnect from "@/src/lib/dbConect";
 
 export async function POST(request: Request) {
-    const { email, code } = await request.json();
-    if (!email.trim() || !code.trim()) {
-        return new Response(JSON.stringify({
-            success: false,
-            message: 'Email and verification code are required',
-        }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
-    }
     try {
         await dbConnect();
-        const verifiedUser = await UserModel.findOne({
-            email,
-            isVerified: true,
-        })
-
-        if(verifiedUser) {
+        const { userId, isAcceptMessages } = await request.json();
+        if (!userId) {
             return new Response(JSON.stringify({
                 success: false,
-                message: 'Email is already verified',
+                message: 'User ID is required',
             }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' },
             });
         }
 
-        const user = await UserModel.findOne({
-            email,
-            verifyCode: code,
-            verifyExpiry: { $gt: new Date() } // Check if the code is still valid
-        });
-
-
+        const user = await UserModel.findById(userId);
         if (!user) {
             return new Response(JSON.stringify({
                 success: false,
-                message: 'Invalid verification code or email',
+                message: 'User not found',
             }), {
-                status: 400,
+                status: 404,
                 headers: { 'Content-Type': 'application/json' },
             });
         }
+
+        user.isAcceptMessages = isAcceptMessages; // Assuming this field is used to accept messages
+        await user.save();
+
         return new Response(JSON.stringify({
             success: true,
-            message: 'Email verified successfully',
+            message: isAcceptMessages ? 'You will now receive messages' : 'You will no longer receive messages',
         }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         });
     } catch (error) {
-        console.error("Database error:", error);
+        console.error("Error processing request:", error);
         return new Response(JSON.stringify({
             success: false,
             message: 'Internal server error',
