@@ -1,5 +1,5 @@
 import UserModel from "@/src/models/User.models";
-import dbConnect from "@/src/lib/dbConect";
+import dbConnect from "@/libs/dbConect";
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);

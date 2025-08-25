@@ -1,5 +1,5 @@
 import sendVerificationEmail from "@/src/helpers/sendVerificationEmail";
-import dbConnect from "@/src/lib/dbConect";
+import dbConnect from "@/libs/dbConect";
 import UserModel from "@/src/models/User.models";
 import bcrypt from "bcryptjs";
 
@@ -72,6 +72,7 @@ export async function POST(request: Request) {
                 });
             } else {
                 // If the user exists but is not verified, update the OTP and send a new verification email
+                existingUserByEmail.username = username; // Update username if needed
                 existingUserByEmail.verifyCode = otp;
                 existingUserByEmail.password = hashedPassword  // Update password if provided
                 existingUserByEmail.verifyExpiry = new Date(Date.now() + 1 * 60 * 60 * 1000); // Set expiry to 1 hour

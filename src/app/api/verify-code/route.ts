@@ -1,4 +1,4 @@
-import dbConnect from "@/src/lib/dbConect";
+import dbConnect from "@/libs/dbConect";
 import UserModel from "@/src/models/User.models";
 import { is } from 'zod/locales';
 
